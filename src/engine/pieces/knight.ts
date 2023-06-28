@@ -2,6 +2,7 @@ import Piece from './piece';
 import Player from '../player';
 import Board from '../board';
 import Square from '../square';
+import SquareState from '../squareState';
 
 export default class Knight extends Piece {
     public constructor(player: Player) {
@@ -24,9 +25,24 @@ export default class Knight extends Piece {
         const availableMoves = new Array();
 
         for (let [x, y] of offsets) {
-            const candidatePosition = new Square(current.row + y, current.col + x);
+            const nextSquare = new Square(current.row + y, current.col + x);
 
-            if (!board.squareOccupied(candidatePosition)) availableMoves.push(candidatePosition);
+
+            switch (board.squareState(nextSquare)) {
+                case SquareState.White:
+                    if (this.player === Player.BLACK) availableMoves.push(nextSquare);
+                    break;
+                case SquareState.Black:
+                    if (this.player === Player.WHITE) availableMoves.push(nextSquare);
+                    break;
+                case SquareState.Free:
+                    availableMoves.push(nextSquare);
+                    break;
+                case SquareState.OutOfBounds:
+                case SquareState.King:
+                    break;
+            }
+
         }
 
         return availableMoves;
