@@ -2,6 +2,8 @@ import Player from './player';
 import GameSettings from './gameSettings';
 import Square from './square';
 import Piece from './pieces/piece';
+import SquareState from './squareState';
+import King from './pieces/king';
 
 export default class Board {
     public currentPlayer: Player;
@@ -32,7 +34,7 @@ export default class Board {
     }
 
     public movePiece(fromSquare: Square, toSquare: Square) {
-        const movingPiece = this.getPiece(fromSquare);        
+        const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
@@ -51,5 +53,13 @@ export default class Board {
     public squareOccupied(position: Square) : boolean {
         if (position.row >= GameSettings.BOARD_SIZE || position.col >= GameSettings.BOARD_SIZE || position.row < 0 || position.col < 0) return true;
         return typeof(this.getPiece(position)) != "undefined"; 
+    }
+
+    public squareState(position: Square): SquareState {
+        if (position.col >= GameSettings.BOARD_SIZE || position.col < 0 || position.row >= GameSettings.BOARD_SIZE || position.row < 0) return SquareState.OutOfBounds;
+        const piece = this.getPiece(position);
+        if (typeof (piece) == "undefined") return SquareState.Free;
+        if (piece instanceof King) return SquareState.King;
+        return piece.player == Player.WHITE ? SquareState.White : SquareState.Black;
     }
 }
