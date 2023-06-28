@@ -3,6 +3,9 @@ import Board from '../../../src/engine/board';
 import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
 import Pawn from '../../../src/engine/pieces/pawn';
+import Rook from '../../../src/engine/pieces/rook';
+import Bishop from '../../../src/engine/pieces/bishop';
+import { expect } from 'chai';
 
 describe('King', () => {
     let board: Board;
@@ -60,7 +63,6 @@ describe('King', () => {
         board.setPiece(Square.at(5, 5), opposingKing);
 
         const moves = king.getAvailableMoves(board);
-
         moves.should.not.deep.include(Square.at(5, 5));
     });
 
@@ -71,7 +73,271 @@ describe('King', () => {
         board.setPiece(Square.at(5, 5), friendlyPiece);
 
         const moves = king.getAvailableMoves(board);
-
         moves.should.not.deep.include(Square.at(5, 5));
+    });
+
+    describe('Castling (white)', () => {
+        it('can castle left if possible', () => {
+            const king = new King(Player.WHITE);
+            const leftRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 0), leftRook);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.deep.include(Square.at(0, 1));
+        });
+
+        it('can castle right if possible', () => {
+            const king = new King(Player.WHITE);
+            const rightRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 7), rightRook);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.deep.include(Square.at(0, 5));
+        });
+
+        it('can\'t castle left if blocked', () => {
+            const king = new King(Player.WHITE);
+            const leftRook = new Rook(Player.WHITE);
+            const blockingBishop = new Bishop(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 0), leftRook);
+            board.setPiece(Square.at(0, 2), blockingBishop);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(0, 1));
+        });
+
+        it('can\'t castle right if blocked', () => {
+            const king = new King(Player.WHITE);
+            const rightRook = new Rook(Player.WHITE);
+            const blockingBishop = new Bishop(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 7), rightRook);
+            board.setPiece(Square.at(0, 5), blockingBishop);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(0, 5));
+        });
+
+        it('can\'t castle left if king has moved', () => {
+            const king = new King(Player.WHITE);
+            const leftRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 0), leftRook);
+
+            board.movePiece(Square.at(0, 3), Square.at(1, 3));
+            board.movePiece(Square.at(1, 3), Square.at(0, 3));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(0, 1));
+        });
+
+        it('can\'t castle right if king has moved', () => {
+            const king = new King(Player.WHITE);
+            const rightRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 7), rightRook);
+
+            board.movePiece(Square.at(0, 3), Square.at(1, 3));
+            board.movePiece(Square.at(1, 3), Square.at(0, 3));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(0, 5));
+        });
+
+        it('can\'t castle left if left rook has moved', () => {
+            const king = new King(Player.WHITE);
+            const leftRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 0), leftRook);
+
+            board.movePiece(Square.at(0, 0), Square.at(1, 0));
+            board.movePiece(Square.at(1, 0), Square.at(0, 0));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(0, 1));
+        });
+
+        it('can\'t castle left if right rook has moved', () => {
+            const king = new King(Player.WHITE);
+            const rightRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 7), rightRook);
+
+            board.movePiece(Square.at(0, 7), Square.at(1, 7));
+            board.movePiece(Square.at(1, 7), Square.at(0, 7));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(0, 5));
+        });
+
+        it('castling left is performed correctly', () => {
+            const king = new King(Player.WHITE);
+            const leftRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 0), leftRook);
+
+            board.movePiece(Square.at(0, 3), Square.at(0, 1));
+
+            expect(board.getPiece(Square.at(0, 1))).instanceOf(King);
+            expect(board.getPiece(Square.at(0, 2))).instanceOf(Rook);
+        });
+
+        it('castling right is performd correctly', () => {
+            const king = new King(Player.WHITE);
+            const rightRook = new Rook(Player.WHITE);
+
+            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 7), rightRook);
+
+            board.movePiece(Square.at(0, 3), Square.at(0, 5));
+
+            expect(board.getPiece(Square.at(0, 5))).instanceOf(King);
+            expect(board.getPiece(Square.at(0, 4))).instanceOf(Rook);
+        });
+    });
+
+    describe('Castling (black)', () => {
+        it('can castle left if possible', () => {
+            const king = new King(Player.BLACK);
+            const leftRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,0), leftRook);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.deep.include(Square.at(7,1));
+        });
+
+        it('can castle right if possible', () => {
+            const king = new King(Player.BLACK);
+            const rightRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,7), rightRook);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.deep.include(Square.at(7,5));
+        });
+
+        it('can\'t castle left if blocked', () => {
+            const king = new King(Player.BLACK);
+            const leftRook = new Rook(Player.BLACK);
+            const blockingBishop = new Bishop(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,0), leftRook);
+            board.setPiece(Square.at(7,2), blockingBishop);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(7,1));
+        });
+
+        it('can\'t castle right if blocked', () => {
+            const king = new King(Player.BLACK);
+            const rightRook = new Rook(Player.BLACK);
+            const blockingBishop = new Bishop(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,7), rightRook);
+            board.setPiece(Square.at(7,5), blockingBishop);
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(7,5));
+        });
+        
+
+        it('can\'t castle left if king has moved', () => {
+            const king = new King(Player.BLACK);
+            const leftRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,0), leftRook);
+
+            board.movePiece(Square.at(7,3), Square.at(6, 3));
+            board.movePiece(Square.at(6, 3), Square.at(7,3));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(7,1));
+        });
+
+        it('can\'t castle right if king has moved', () => {
+            const king = new King(Player.BLACK);
+            const rightRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,7), rightRook);
+
+            board.movePiece(Square.at(7,3), Square.at(6, 3));
+            board.movePiece(Square.at(6, 3), Square.at(7,3));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(7,5));
+        });
+
+        it('can\'t castle left if left rook has moved', () => {
+            const king = new King(Player.BLACK);
+            const leftRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,0), leftRook);
+
+            board.movePiece(Square.at(7,0), Square.at(6, 0));
+            board.movePiece(Square.at(6, 0), Square.at(7,0));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(7,1));
+        });
+
+        it('can\'t castle left if right rook has moved', () => {
+            const king = new King(Player.BLACK);
+            const rightRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,7), rightRook);
+
+            board.movePiece(Square.at(7,7), Square.at(6, 7));
+            board.movePiece(Square.at(6, 7), Square.at(7,7));
+
+            const kingMoves = king.getAvailableMoves(board);
+            kingMoves.should.not.deep.include(Square.at(7,5));
+        });
+
+        it('castling left is performed correctly', () => {
+            const king = new King(Player.BLACK);
+            const leftRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,0), leftRook);
+
+            board.movePiece(Square.at(7,3), Square.at(7,1));
+
+            expect(board.getPiece(Square.at(7,1))).instanceOf(King);
+            expect(board.getPiece(Square.at(7,2))).instanceOf(Rook);
+        });
+
+        it('castling right is performd correctly', () => {
+            const king = new King(Player.BLACK);
+            const rightRook = new Rook(Player.BLACK);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(7,7), rightRook);
+
+            board.movePiece(Square.at(7,3), Square.at(7,5));
+
+            expect(board.getPiece(Square.at(7,5))).instanceOf(King);
+            expect(board.getPiece(Square.at(7,4))).instanceOf(Rook);
+        });
     });
 });
