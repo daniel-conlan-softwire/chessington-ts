@@ -4,6 +4,8 @@ import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
 import Rook from '../../../src/engine/pieces/rook';
 import King from '../../../src/engine/pieces/king';
+import Queen from '../../../src/engine/pieces/queen';
+import { expect } from 'chai';
 
 describe('Pawn', () => {
 
@@ -83,6 +85,28 @@ describe('Pawn', () => {
 
             moves.should.not.deep.include(Square.at(5, 3));
         });
+
+        it('promotes when on the last row', () => {
+            const pawn = new Pawn(Player.WHITE);
+            board.setPiece(Square.at(6, 4), pawn);
+
+            board.movePiece(Square.at(6,4), Square.at(7,4));
+
+            const piece = board.getPiece(Square.at(7,4));
+
+            expect(piece).instanceOf(Queen);
+        });
+
+        it('doesn\'t promote when not on the last row', () => {
+            const pawn = new Pawn(Player.WHITE);
+            board.setPiece(Square.at(5, 4), pawn);
+
+            board.movePiece(Square.at(5,4), Square.at(6,4));
+
+            const piece = board.getPiece(Square.at(6,4));
+
+            expect(piece).instanceOf(Pawn);
+        })
     });
 
     describe('black pawns', () => {
@@ -161,6 +185,28 @@ describe('Pawn', () => {
 
             moves.should.not.deep.include(Square.at(3, 3));
         });
+
+        it('promotes when on the last row', () => {
+            const pawn = new Pawn(Player.BLACK);
+            board.setPiece(Square.at(1, 4), pawn);
+
+            board.movePiece(Square.at(1,4), Square.at(0,4));
+
+            const piece = board.getPiece(Square.at(0,4));
+
+            expect(piece).instanceOf(Queen);
+        });
+
+        it('doesn\'t promote when on the last row', () => {
+            const pawn = new Pawn(Player.BLACK);
+            board.setPiece(Square.at(2, 4), pawn);
+
+            board.movePiece(Square.at(2,4), Square.at(1,4));
+
+            const piece = board.getPiece(Square.at(1,4));
+
+            expect(piece).instanceOf(Pawn);
+        })
     });
 
     it('cannot move if there is a piece in front', () => {

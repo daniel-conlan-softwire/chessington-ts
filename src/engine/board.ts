@@ -4,6 +4,8 @@ import Square from './square';
 import Piece from './pieces/piece';
 import SquareState from './squareState';
 import King from './pieces/king';
+import Pawn from './pieces/pawn';
+import Queen from './pieces/queen';
 
 export default class Board {
     public currentPlayer: Player;
@@ -38,7 +40,15 @@ export default class Board {
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
+
+            if (movingPiece instanceof Pawn && toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
+                this.setPiece(toSquare, new Queen(
+                    movingPiece.player
+                ));
+            }
+            
             this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+
         }
     }
 
@@ -50,17 +60,35 @@ export default class Board {
         return board;
     }
 
-    public squareOccupied(position: Square) : boolean {
+    public squareOccupied(position: Square): boolean {
         if (position.row >= GameSettings.BOARD_SIZE || position.col >= GameSettings.BOARD_SIZE || position.row < 0 || position.col < 0) return true;
-        return typeof(this.getPiece(position)) != "undefined"; 
+        return typeof (this.getPiece(position)) != "undefined";
     }
 
     public squareState(position: Square): SquareState {
-        if (position.col >= GameSettings.BOARD_SIZE || position.col < 0 || position.row >= GameSettings.BOARD_SIZE || position.row < 0) return SquareState.OutOfBounds;
+
+        if (
+            position.col >= GameSettings.BOARD_SIZE
+            || position.col < 0
+            || position.row >= GameSettings.BOARD_SIZE
+            || position.row < 0
+        ) {
+            return SquareState.OutOfBounds;
+        }
+
         const piece = this.getPiece(position);
-        if (typeof (piece) == "undefined") return SquareState.Free;
-        if (piece instanceof King) return SquareState.King;
-        return piece.player == Player.WHITE ? SquareState.White : SquareState.Black;
+
+
+        if (typeof (piece) == "undefined") {
+            return SquareState.Free;
+        } else if (piece instanceof King) {
+            return SquareState.King;
+        } else if (piece.player == Player.WHITE) {
+            return SquareState.White;
+        } else {
+            return SquareState.Black
+        }
+
     }
 
 }

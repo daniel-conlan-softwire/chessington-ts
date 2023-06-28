@@ -47,7 +47,5 @@ export default class Piece {
             case SquareState.Free:
                 return false;
         }
-
     }
-
 }

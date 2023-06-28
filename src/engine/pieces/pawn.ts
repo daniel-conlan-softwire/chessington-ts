@@ -41,7 +41,7 @@ export default class Pawn extends Piece {
             if (this.isSquareAvailable(nextSquare, this.player, board)) {
                 availableMoves.push(nextSquare);
             }
-            
+
         }
 
         return availableMoves;
