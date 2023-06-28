@@ -47,4 +47,9 @@ export default class Board {
         }
         return board;
     }
+
+    public squareOccupied(position: Square) : boolean {
+        if (position.row >= GameSettings.BOARD_SIZE || position.col >= GameSettings.BOARD_SIZE || position.row < 0 || position.col < 0) return false;
+        return typeof(this.getPiece(position)) != "undefined"; 
+    }
 }
