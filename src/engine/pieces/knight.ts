@@ -26,7 +26,7 @@ export default class Knight extends Piece {
         for (let [x, y] of offsets) {
             const candidatePosition = new Square(current.row + y, current.col + x);
 
-            availableMoves.push(candidatePosition);
+            if (!board.squareOccupied(candidatePosition)) availableMoves.push(candidatePosition);
         }
 
         return availableMoves;
