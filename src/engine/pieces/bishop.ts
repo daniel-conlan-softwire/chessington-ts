@@ -15,42 +15,16 @@ export default class Bishop extends Piece {
         const currentRow = currentPosition.row;
         const currentCol = currentPosition.col;
 
-        // Upwards
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow + offset, currentCol + offset);
+        // Everywhere
+        for (let leftMult of [1, -1]) for (let rightMult of [1, -1]) {
+            for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
+                const nextSquare = new Square(currentRow + offset*leftMult, currentCol + offset*rightMult);
 
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
+                if (!board.squareOccupied(nextSquare)) {
+                    availableMoves.push(nextSquare);
+                } else break;
             }
         }
-
-        // Downards
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow - offset, currentCol + offset);
-
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
-            }
-        }
-
-        // Left
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow + offset, currentCol - offset);
-
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
-            }
-        }
-
-        // Right
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow - offset, currentCol - offset);
-
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
-            }
-        }
-
 
         return availableMoves;
     }
