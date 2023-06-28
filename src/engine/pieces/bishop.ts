@@ -12,13 +12,11 @@ export default class Bishop extends Piece {
     public getAvailableMoves(board: Board) {
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
-        const currentRow = currentPosition.row;
-        const currentCol = currentPosition.col;
 
         // Everywhere
         for (let leftMult of [1, -1]) for (let rightMult of [1, -1]) {
             for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-                const nextSquare = new Square(currentRow + offset*leftMult, currentCol + offset*rightMult);
+                const nextSquare = new Square(currentPosition.row + offset*leftMult, currentPosition.col + offset*rightMult);
 
                 if (!board.squareOccupied(nextSquare)) {
                     availableMoves.push(nextSquare);

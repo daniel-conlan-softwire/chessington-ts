@@ -13,8 +13,6 @@ export default class Rook extends Piece {
 
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
-        const currentRow = currentPosition.row;
-        const currentCol = currentPosition.col;
 
         const mults = [
             [1, 0],
@@ -26,7 +24,7 @@ export default class Rook extends Piece {
         // Upwards
         for (let [rowMult, colMult] of mults) {
             for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-                const nextSquare = new Square(currentRow + offset*rowMult, currentCol + offset*colMult);
+                const nextSquare = new Square(currentPosition.row + offset*rowMult, currentPosition.col + offset*colMult);
 
                 if (!board.squareOccupied(nextSquare)) {
                     availableMoves.push(nextSquare);
