@@ -16,42 +16,23 @@ export default class Rook extends Piece {
         const currentRow = currentPosition.row;
         const currentCol = currentPosition.col;
 
+        const mults = [
+            [1, 0],
+            [-1, 0],
+            [0, 1],
+            [0, -1],
+        ]
+
         // Upwards
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow + offset, currentCol);
+        for (let [rowMult, colMult] of mults) {
+            for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
+                const nextSquare = new Square(currentRow + offset*rowMult, currentCol + offset*colMult);
 
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
+                if (!board.squareOccupied(nextSquare)) {
+                    availableMoves.push(nextSquare);
+                } else break;
             }
         }
-
-        // Downards
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow - offset, currentCol);
-
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
-            }
-        }
-
-        // Left
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow, currentCol - offset);
-
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
-            }
-        }
-
-        // Right
-        for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-            const nextSquare = new Square(currentRow, currentCol + offset);
-
-            if (!board.squareOccupied(nextSquare)) {
-                availableMoves.push(nextSquare);
-            }
-        }
-
 
         return availableMoves;
     }
