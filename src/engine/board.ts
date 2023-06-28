@@ -62,4 +62,5 @@ export default class Board {
         if (piece instanceof King) return SquareState.King;
         return piece.player == Player.WHITE ? SquareState.White : SquareState.Black;
     }
+
 }

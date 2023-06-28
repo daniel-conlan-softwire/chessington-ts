@@ -14,25 +14,20 @@ export default class King extends Piece {
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
 
-
         const offsets = [1, 0, -1];
 
-        for (let x of offsets) for (let y of offsets) {
-            const nextSquare = new Square(currentPosition.row + x, currentPosition.col + y);
-            switch (board.squareState(nextSquare)) {
-                
-                case SquareState.White:
-                    if (this.player === Player.BLACK) availableMoves.push(nextSquare);
-                    break;
-                case SquareState.Black:
-                    if (this.player === Player.WHITE) availableMoves.push(nextSquare);
-                    break;
-                case SquareState.Free:
+        for (let rowOffset of offsets) {
+            for (let colOffset of offsets) {
+
+                const nextSquare = new Square(
+                    currentPosition.row + rowOffset,
+                    currentPosition.col + colOffset
+                );
+
+                if (this.isSquareAvailable(nextSquare, this.player, board)) {
                     availableMoves.push(nextSquare);
-                    break;
-                case SquareState.OutOfBounds:
-                case SquareState.King:
-                    break;
+                }
+                
             }
         }
         return availableMoves;

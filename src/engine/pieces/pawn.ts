@@ -31,23 +31,32 @@ export default class Pawn extends Piece {
             }
         }
 
-        for (let x of [-1, 1]) {
-            const nextSquare = new Square(currentPosition.row + moveDirection, currentPosition.col + x);
+        for (let takeDirection of [-1, 1]) {
 
-            switch (board.squareState(nextSquare)) {
-                case SquareState.White:
-                    if (this.player === Player.BLACK) availableMoves.push(nextSquare);
-                    break;
-                case SquareState.Black:
-                    if (this.player === Player.WHITE) availableMoves.push(nextSquare);
-                    break;
-                case SquareState.Free:
-                case SquareState.OutOfBounds:
-                case SquareState.King:
-                    break;
+            const nextSquare = new Square(
+                currentPosition.row + moveDirection,
+                currentPosition.col + takeDirection
+            );
+
+            if (this.isSquareAvailable(nextSquare, this.player, board)) {
+                availableMoves.push(nextSquare);
             }
+            
         }
 
         return availableMoves;
+    }
+
+    protected isSquareAvailable(square: Square, player: Player, board: Board): boolean {
+        switch (board.squareState(square)) {
+            case SquareState.White:
+                return this.player === Player.BLACK;
+            case SquareState.Black:
+                return this.player === Player.WHITE;
+            case SquareState.Free:
+            case SquareState.King:
+            case SquareState.OutOfBounds:
+                return false;
+        }
     }
 }

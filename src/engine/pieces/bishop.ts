@@ -11,37 +11,29 @@ export default class Bishop extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
+
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
 
         // Everywhere
-        for (let leftMult of [1, -1]) for (let rightMult of [1, -1]) {
-            for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-                const nextSquare = new Square(currentPosition.row + offset * leftMult, currentPosition.col + offset * rightMult);
+        for (let rowOffsetDirection of [1, -1]) {
+            for (let colOffsetDirection of [1, -1]) {
+                for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
 
-                let earlyBreak = false;
+                    const nextSquare = new Square(
+                        currentPosition.row + offset*rowOffsetDirection,
+                        currentPosition.col + offset*colOffsetDirection
+                    );
 
-                switch (board.squareState(nextSquare)) {
-                    case SquareState.White:
-                        if (this.player === Player.BLACK) availableMoves.push(nextSquare);
-                        earlyBreak = true;
-                        break;
-                    case SquareState.Black:
-                        if (this.player === Player.WHITE) availableMoves.push(nextSquare);
-                        earlyBreak = true;
-                        break;
-                    case SquareState.OutOfBounds:
-                        earlyBreak = true; break;
-                    case SquareState.Free:
+                    if (this.isSquareAvailable(nextSquare, this.player, board)) {
                         availableMoves.push(nextSquare);
+                    }
+
+                    if (this.isSquareBlocking(nextSquare, this.player, board)) {
                         break;
-                    case SquareState.King:
-                        earlyBreak = true;
-                        break;
+                    }
+
                 }
-
-                if (earlyBreak) break;
-
             }
         }
 

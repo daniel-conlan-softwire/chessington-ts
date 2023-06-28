@@ -24,23 +24,12 @@ export default class Knight extends Piece {
         const current = board.findPiece(this);
         const availableMoves = new Array();
 
-        for (let [x, y] of offsets) {
-            const nextSquare = new Square(current.row + y, current.col + x);
+        for (let [rowOffset, colOffset] of offsets) {
 
+            const nextSquare = new Square(current.row + rowOffset, current.col + colOffset);
 
-            switch (board.squareState(nextSquare)) {
-                case SquareState.White:
-                    if (this.player === Player.BLACK) availableMoves.push(nextSquare);
-                    break;
-                case SquareState.Black:
-                    if (this.player === Player.WHITE) availableMoves.push(nextSquare);
-                    break;
-                case SquareState.Free:
-                    availableMoves.push(nextSquare);
-                    break;
-                case SquareState.OutOfBounds:
-                case SquareState.King:
-                    break;
+            if (this.isSquareAvailable(nextSquare, this.player, board)) {
+                availableMoves.push(nextSquare);
             }
 
         }

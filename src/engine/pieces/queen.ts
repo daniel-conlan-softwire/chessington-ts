@@ -11,39 +11,33 @@ export default class Queen extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
+
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
 
-        const mults = [-1,0,1];
+        const offsetDirections = [-1, 0, 1];
 
-        for (let xMul of mults) for (let yMul of mults) {
-            if (xMul == 0 && yMul == 0) continue;
-            for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
-                const nextSquare = new Square(currentPosition.row + offset*yMul, currentPosition.col + offset*xMul);
-    
-                let earlyBreak = false;
+        for (let rowOffsetDirection of offsetDirections) {
+            for (let colOffsetDirection of offsetDirections) {
 
-                switch (board.squareState(nextSquare)) {
-                    case SquareState.White:
-                        if (this.player === Player.BLACK) availableMoves.push(nextSquare);
-                        earlyBreak = true;
-                        break;
-                    case SquareState.Black:
-                        if (this.player === Player.WHITE) availableMoves.push(nextSquare);
-                        earlyBreak = true;
-                        break;
-                    case SquareState.OutOfBounds:
-                        earlyBreak = true; break;
-                    case SquareState.Free:
+                if (rowOffsetDirection == 0 && colOffsetDirection == 0) continue;
+
+                for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
+
+                    const nextSquare = new Square(
+                        currentPosition.row + offset * rowOffsetDirection,
+                        currentPosition.col + offset * colOffsetDirection
+                    );
+
+                    if (this.isSquareAvailable(nextSquare, this.player, board)) {
                         availableMoves.push(nextSquare);
-                        break;
-                    case SquareState.King:
-                        earlyBreak = true;
-                        break;
-                }
+                    }
 
-                if (earlyBreak) break;
-            
+                    if (this.isSquareBlocking(nextSquare, this.player, board)) {
+                        break;
+                    }
+
+                }
             }
         }
 
