@@ -7,32 +7,15 @@ import King from './pieces/king';
 import Pawn from './pieces/pawn';
 import Queen from './pieces/queen';
 
-class Move {
-    fromSquare: Square;
-    toSquare: Square;
-    piece: Piece;
-
-
-    constructor(from: Square,
-        to: Square,
-        piece: Piece,
-
-    ) {
-        this.fromSquare = from;
-        this.toSquare = to;
-        this.piece = piece;
-    }
-}
-
 export default class Board {
     public currentPlayer: Player;
+    public turn : number;
     private readonly board: (Piece | undefined)[][];
-
-    public moves: Array<Move> = new Array();
 
     public constructor(currentPlayer?: Player) {
         this.currentPlayer = currentPlayer ? currentPlayer : Player.WHITE;
         this.board = this.createBoard();
+        this.turn = 1;
     }
 
     public setPiece(square: Square, piece: Piece | undefined) {
@@ -63,31 +46,31 @@ export default class Board {
 
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
-
             movingPiece.hasMoved = true;
+            
             if (movingPiece instanceof Pawn) {
                 this.checkSpecialPawnMoves(toSquare, fromSquare, movingPiece, nextSquareState);
             } else if (movingPiece instanceof King) {
                 this.checkSpecialKingMoves(toSquare, fromSquare, movingPiece);
             }
-            this.moves.push(new Move(
-                fromSquare,
-                toSquare,
-                movingPiece,
-            ));
+
             this.swapPlayer();
         }
     }
 
-    private checkSpecialPawnMoves(toSquare: Square, fromSquare: Square, movingPiece: Piece, nextSquareState: SquareState) {
+    private checkSpecialPawnMoves(toSquare: Square, fromSquare: Square, movingPiece: Pawn, nextSquareState: SquareState) {
 
         // Pawn Promotion
         if (toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
             this.setPiece(toSquare, new Queen(
                 movingPiece.player
-            ));
+            )); 
+        
+        // Double Pawn Move
+        } else if (Math.abs(toSquare.row - fromSquare.row) === 2) {
+            movingPiece.doubleMoveTurn = this.turn;
 
-            // En Passant
+        // En Passant
         } else if (fromSquare.col !== toSquare.col && nextSquareState === SquareState.Free) {
             const targetPawnSquare = Square.at(fromSquare.row, toSquare.col);
             this.setPiece(targetPawnSquare, undefined);
@@ -109,18 +92,14 @@ export default class Board {
             this.setPiece(rookTo, rook);
             this.setPiece(rookFrom, undefined);
             rook!.hasMoved = true;
-            return new Move(
-                rookFrom,
-                rookTo,
-                rook!,
-            );
+
         }
-        return null;
 
     }
 
     private swapPlayer() {
         this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+        this.turn++;
     }
 
     private createBoard() {
