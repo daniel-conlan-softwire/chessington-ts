@@ -153,19 +153,31 @@ describe('Pawn', () => {
                 moves.should.not.deep.include(Square.at(5, 3));
             });
 
-            it("cannot take a pawn en passant if a turn has passed", () => {
+            it("en passant works correctly (left)", () => {
                 const pawn = new Pawn(Player.WHITE);
                 const opposingPawn = new Pawn(Player.BLACK);
                 board.currentPlayer = Player.BLACK;
                 board.setPiece(Square.at(4, 4), pawn);
                 board.setPiece(Square.at(6, 3), opposingPawn);
-
                 board.movePiece(Square.at(6, 3), Square.at(4, 3));
-                board.movePiece(Square.at(4, 4), Square.at(3, 4));
+                board.movePiece(Square.at(4, 4), Square.at(5, 3));
 
-                const moves = pawn.getAvailableMoves(board);
 
-                moves.should.not.deep.include(Square.at(5, 3));
+                expect(board.getPiece(Square.at(4, 3))).to.be.undefined;
+                expect(board.getPiece(Square.at(5, 3))).to.be.equal(pawn);
+            });
+
+            it("en passant works correctly (right)", () => {
+                const pawn = new Pawn(Player.WHITE);
+                const opposingPawn = new Pawn(Player.BLACK);
+                board.currentPlayer = Player.BLACK;
+                board.setPiece(Square.at(4, 4), pawn);
+                board.setPiece(Square.at(6, 5), opposingPawn);
+                board.movePiece(Square.at(6, 5), Square.at(4, 5));
+                board.movePiece(Square.at(4, 4), Square.at(5, 5));
+
+                expect(board.getPiece(Square.at(4, 5))).to.be.undefined;
+                expect(board.getPiece(Square.at(6, 5))).to.be.equal(pawn);
             });
         });
     });
@@ -326,6 +338,33 @@ describe('Pawn', () => {
                 const moves = pawn.getAvailableMoves(board);
 
                 moves.should.not.deep.include(Square.at(2, 3));
+            });
+
+            it("en passant works correctly (left)", () => {
+                const pawn = new Pawn(Player.BLACK);
+                const opposingPawn = new Pawn(Player.WHITE);
+                board.currentPlayer = Player.WHITE;
+                board.setPiece(Square.at(3, 4), pawn);
+                board.setPiece(Square.at(1, 3), opposingPawn);
+                board.movePiece(Square.at(1, 3), Square.at(3, 3));
+                board.movePiece(Square.at(3, 4), Square.at(2, 3));
+
+
+                expect(board.getPiece(Square.at(3, 3))).to.be.undefined;
+                expect(board.getPiece(Square.at(2, 3))).to.be.equal(pawn);
+            });
+
+            it("en passant works correctly (right)", () => {
+                const pawn = new Pawn(Player.BLACK);
+                const opposingPawn = new Pawn(Player.WHITE);
+                board.currentPlayer = Player.WHITE;
+                board.setPiece(Square.at(3, 4), pawn);
+                board.setPiece(Square.at(1, 5), opposingPawn);
+                board.movePiece(Square.at(1, 5), Square.at(3, 5));
+                board.movePiece(Square.at(3, 4), Square.at(2, 5));
+
+                expect(board.getPiece(Square.at(3, 5))).to.be.undefined;
+                expect(board.getPiece(Square.at(2, 5))).to.be.equal(pawn);
             });
         });
     });
