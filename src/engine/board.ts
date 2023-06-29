@@ -12,14 +12,15 @@ class Move {
     toSquare: Square;
     piece: Piece;
 
-    /// for castling
-    secondaryMove: Move | null;
 
-    constructor(from : Square, to : Square, piece : Piece, secondary?: Move | null) {
+    constructor(from: Square,
+        to: Square,
+        piece: Piece,
+
+    ) {
         this.fromSquare = from;
         this.toSquare = to;
         this.piece = piece;
-        this.secondaryMove = secondary ?? null;
     }
 }
 
@@ -39,7 +40,7 @@ export default class Board {
     }
 
     public getPiece(square: Square) {
-        if (square.row >= GameSettings.BOARD_SIZE || square.row < 0) return undefined; 
+        if (square.row >= GameSettings.BOARD_SIZE || square.row < 0) return undefined;
         return this.board[square.row][square.col];
     }
 
@@ -57,49 +58,65 @@ export default class Board {
     public movePiece(fromSquare: Square, toSquare: Square) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+
+            const nextSquareState = this.squareState(toSquare);
+
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
 
             movingPiece.hasMoved = true;
-            let secondaryMove;
-
             if (movingPiece instanceof Pawn) {
-
-                if (toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
-                    this.setPiece(toSquare, new Queen(
-                        movingPiece.player
-                    ));
-                }
-
+                this.checkSpecialPawnMoves(toSquare, fromSquare, movingPiece, nextSquareState);
             } else if (movingPiece instanceof King) {
-                const diff = toSquare.col - fromSquare.col;
-                const kingHasCastled = Math.abs(diff) === 2;
-
-                if (kingHasCastled) {
-                    const isCastleRight = (diff === 2);
-                    const rookFrom = Square.at(toSquare.row, isCastleRight ? 7 : 0);
-                    const rookTo = Square.at(toSquare.row, toSquare.col + (isCastleRight ? -1 : 1));
-                    const rook = this.getPiece(rookFrom);
-
-                    this.setPiece(rookTo, rook);
-                    this.setPiece(rookFrom, undefined);
-                    rook!.hasMoved = true;
-                    secondaryMove = new Move(
-                        rookFrom,
-                        rookTo,
-                        rook!,
-                    );
-                }
-
+                this.checkSpecialKingMoves(toSquare, fromSquare, movingPiece);
             }
             this.moves.push(new Move(
                 fromSquare,
                 toSquare,
                 movingPiece,
-                secondaryMove,
             ));
             this.swapPlayer();
         }
+    }
+
+    private checkSpecialPawnMoves(toSquare: Square, fromSquare: Square, movingPiece: Piece, nextSquareState: SquareState) {
+
+        // Pawn Promotion
+        if (toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
+            this.setPiece(toSquare, new Queen(
+                movingPiece.player
+            ));
+
+            // En Passant
+        } else if (fromSquare.col !== toSquare.col && nextSquareState === SquareState.Free) {
+            const targetPawnSquare = Square.at(fromSquare.row, toSquare.col);
+            this.setPiece(targetPawnSquare, undefined);
+        }
+
+    }
+
+    private checkSpecialKingMoves(toSquare: Square, fromSquare: Square, movingPiece: Piece) {
+
+        const diff = toSquare.col - fromSquare.col;
+        const kingHasCastled = Math.abs(diff) === 2;
+
+        if (kingHasCastled) {
+            const isCastleRight = (diff === 2);
+            const rookFrom = Square.at(toSquare.row, isCastleRight ? 7 : 0);
+            const rookTo = Square.at(toSquare.row, toSquare.col + (isCastleRight ? -1 : 1));
+            const rook = this.getPiece(rookFrom);
+
+            this.setPiece(rookTo, rook);
+            this.setPiece(rookFrom, undefined);
+            rook!.hasMoved = true;
+            return new Move(
+                rookFrom,
+                rookTo,
+                rook!,
+            );
+        }
+        return null;
+
     }
 
     private swapPlayer() {

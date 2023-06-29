@@ -68,7 +68,7 @@ export default class Pawn extends Piece {
 
 
 
-            if (targetPawn instanceof Pawn && board.squareState(enPassantSquare) === SquareState.Free) {
+            if (targetPawn instanceof Pawn && board.squareState(enPassantSquare) === SquareState.Free && board.moves.length > 0) {
                 
                 const lastMove = board.moves.at(-1)!;
 
