@@ -175,6 +175,34 @@ export default class Board {
         }
 
         return true;
+    }
 
+    public findKing(player: Player) : [King, number, number] | null {
+        for (let row = 0; row < GameSettings.BOARD_SIZE; row++) for (let column = 0; column < GameSettings.BOARD_SIZE; column++) {
+            const piece = this.getPiece(Square.at(row, column));
+            if (piece instanceof King && piece.player === player) {
+                return [piece, row, column];
+            }
+        }
+        return null;
+    }
+
+    public isCheck(player: Player, position?: Square) : boolean {
+        const [king, currentRow, currentCol] = this.findKing(player)!;
+        const row = position?.row ?? currentRow;
+        const column = position?.col ?? currentCol;
+        for (let r = 0; r < GameSettings.BOARD_SIZE; r++) for (let c = 0; c < GameSettings.BOARD_SIZE; c++) {
+            const piece = this.getPiece(Square.at(r, c)) ?? null;
+            if (piece !== null) {
+                if (piece.player !== player) {
+                    console.log(piece._getAvailableMoves(this).kingSquares);
+                    if (piece._getAvailableMoves(this).kingSquares.findIndex((s) => s.row === row && s.col === column) !== -1) {
+                        console.log("returning true");
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

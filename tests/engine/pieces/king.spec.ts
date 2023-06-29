@@ -6,6 +6,7 @@ import Pawn from '../../../src/engine/pieces/pawn';
 import Rook from '../../../src/engine/pieces/rook';
 import Bishop from '../../../src/engine/pieces/bishop';
 import { expect } from 'chai';
+import Queen from '../../../src/engine/pieces/queen';
 
 describe('King', () => {
     let board: Board;
@@ -344,6 +345,28 @@ describe('King', () => {
 
             expect(board.getPiece(Square.at(7,5))).instanceOf(King);
             expect(board.getPiece(Square.at(7,4))).instanceOf(Rook);
+        });
+    });
+
+    describe("check", () => {
+        it("should return true if king is in check", () => {
+            const king = new King(Player.BLACK);
+            const queen = new Queen(Player.WHITE);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(0,3), queen);
+
+            board.isCheck(Player.BLACK).should.be.true;
+        });
+
+        it("should return false if king is not in check", () => {
+            const king = new King(Player.BLACK);
+            const queen = new Queen(Player.WHITE);
+
+            board.setPiece(Square.at(7,3), king);
+            board.setPiece(Square.at(0,5), queen);
+
+            board.isCheck(Player.BLACK).should.be.false;
         });
     });
 });

@@ -4,6 +4,7 @@ import Board from '../board';
 import Square from '../square';
 import GameSettings from '../gameSettings';
 import SquareState from '../squareState';
+import AvailableMoves from '../availableMoves';
 
 export default class Pawn extends Piece {
 
@@ -14,24 +15,24 @@ export default class Pawn extends Piece {
         this.doubleMoveTurn = -1;
     }
 
-    public getAvailableMoves(board: Board) {
+    public _getAvailableMoves(board: Board) : AvailableMoves {
 
         const moveDirection = (this.player === Player.WHITE) ? 1 : -1;
 
-        const availableMoves = new Array();
+        const availableMoves = new AvailableMoves();
         const currentPosition = board.findPiece(this);
         const nextPosition = new Square(currentPosition.row + moveDirection, currentPosition.col);
 
         // Moving Forwards
         if (!board.squareOccupied(nextPosition)) {
-            availableMoves.push(nextPosition);
+            availableMoves.availableSquares.push(nextPosition);
 
             const row = this.player === Player.WHITE ? 1 : GameSettings.BOARD_SIZE - 2;
 
             if (currentPosition.row === row) {
                 const doubleMovePosition = new Square(nextPosition.row + moveDirection, currentPosition.col);
                 if (!board.squareOccupied(doubleMovePosition)) {
-                    availableMoves.push(doubleMovePosition);
+                    availableMoves.availableSquares.push(doubleMovePosition);
                 }
             }
         }
@@ -45,7 +46,9 @@ export default class Pawn extends Piece {
             );
 
             if (this.isSquareAvailable(targetSquare, this.player, board)) {
-                availableMoves.push(targetSquare);
+                availableMoves.availableSquares.push(targetSquare);
+            } else if (board.squareState(targetSquare) === SquareState.King) {
+                availableMoves.kingSquares.push(targetSquare);
             }
 
         }
@@ -74,7 +77,7 @@ export default class Pawn extends Piece {
 
                 
                 if (lastMove.piece === targetPawn && Math.abs(lastMove.toSquare.row - lastMove.fromSquare.row) === 2) {
-                    availableMoves.push(enPassantSquare);
+                    availableMoves.availableSquares.push(enPassantSquare);
                 }
             }
 

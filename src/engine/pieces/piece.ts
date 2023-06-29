@@ -2,8 +2,9 @@ import Player from '../player';
 import Board from '../board';
 import Square from '../square';
 import SquareState from '../squareState';
+import AvailableMoves from '../availableMoves';
 
-export default class Piece {
+export default abstract class Piece {
     public player: Player;
     public hasMoved: boolean;
 
@@ -12,15 +13,15 @@ export default class Piece {
         this.hasMoved = false;
     }
 
+    public abstract _getAvailableMoves(board: Board) : AvailableMoves;
     public getAvailableMoves(board: Board) {
-        throw new Error('This method must be implemented, and return a list of available moves');
+        return this._getAvailableMoves(board).availableSquares;
     }
 
     public moveTo(board: Board, newSquare: Square) {
         const currentSquare = board.findPiece(this);
         board.movePiece(currentSquare, newSquare);
     }
-
 
     protected isSquareAvailable(square: Square, player: Player, board: Board) {
         
