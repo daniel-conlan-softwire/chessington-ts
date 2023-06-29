@@ -7,9 +7,27 @@ import King from './pieces/king';
 import Pawn from './pieces/pawn';
 import Queen from './pieces/queen';
 
+class Move {
+    fromSquare: Square;
+    toSquare: Square;
+    piece: Piece;
+
+    /// for castling
+    secondaryMove: Move | null;
+
+    constructor(from : Square, to : Square, piece : Piece, secondary?: Move | null) {
+        this.fromSquare = from;
+        this.toSquare = to;
+        this.piece = piece;
+        this.secondaryMove = secondary ?? null;
+    }
+}
+
 export default class Board {
     public currentPlayer: Player;
     private readonly board: (Piece | undefined)[][];
+
+    public moves: Array<Move> = new Array();
 
     public constructor(currentPlayer?: Player) {
         this.currentPlayer = currentPlayer ? currentPlayer : Player.WHITE;
@@ -21,6 +39,7 @@ export default class Board {
     }
 
     public getPiece(square: Square) {
+        if (square.row >= GameSettings.BOARD_SIZE || square.row < 0) return undefined; 
         return this.board[square.row][square.col];
     }
 
@@ -42,8 +61,10 @@ export default class Board {
             this.setPiece(fromSquare, undefined);
 
             movingPiece.hasMoved = true;
+            let secondaryMove;
 
             if (movingPiece instanceof Pawn) {
+
                 if (toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
                     this.setPiece(toSquare, new Queen(
                         movingPiece.player
@@ -55,7 +76,6 @@ export default class Board {
                 const kingHasCastled = Math.abs(diff) === 2;
 
                 if (kingHasCastled) {
-
                     const isCastleRight = (diff === 2);
                     const rookFrom = Square.at(toSquare.row, isCastleRight ? 7 : 0);
                     const rookTo = Square.at(toSquare.row, toSquare.col + (isCastleRight ? -1 : 1));
@@ -64,13 +84,27 @@ export default class Board {
                     this.setPiece(rookTo, rook);
                     this.setPiece(rookFrom, undefined);
                     rook!.hasMoved = true;
+                    secondaryMove = new Move(
+                        rookFrom,
+                        rookTo,
+                        rook!,
+                    );
                 }
+
             }
+            this.moves.push(new Move(
+                fromSquare,
+                toSquare,
+                movingPiece,
+                secondaryMove,
+            ));
             this.swapPlayer();
         }
     }
 
-    private swapPlayer() { this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE); }
+    private swapPlayer() {
+        this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+    }
 
     private createBoard() {
         const board = new Array(GameSettings.BOARD_SIZE);
@@ -126,17 +160,4 @@ export default class Board {
         return true;
 
     }
-
-    // public isFreeRowPath(from: Square, to: Square) {
-
-    //     //const pathDirection = (from.col <) ? ;
-
-    //     for (let column = from.col; column != to.col; column += pathDirection) {
-    //         if (Square.at())
-    //     }
-
-    //     return true;
-
-    // }
-
 }

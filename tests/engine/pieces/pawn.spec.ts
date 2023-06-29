@@ -112,9 +112,11 @@ describe('Pawn', () => {
             it("can take a pawn en passant (left)", () => {
                 const pawn = new Pawn(Player.WHITE);
                 const opposingPawn = new Pawn(Player.BLACK);
+                board.currentPlayer = Player.BLACK;
                 board.setPiece(Square.at(4, 4), pawn);
                 board.setPiece(Square.at(6, 3), opposingPawn);
                 board.movePiece(Square.at(6, 3), Square.at(4, 3));
+
 
                 const moves = pawn.getAvailableMoves(board);
 
@@ -268,11 +270,10 @@ describe('Pawn', () => {
         });
 
         describe('en passant', () => {
-
-
             it("can take a pawn en passant (left)", () => {
                 const pawn = new Pawn(Player.BLACK);
                 const opposingPawn = new Pawn(Player.WHITE);
+                board.currentPlayer = Player.WHITE;
                 board.setPiece(Square.at(3, 4), pawn);
                 board.setPiece(Square.at(1, 3), opposingPawn);
                 board.movePiece(Square.at(1, 3), Square.at(3, 3));
