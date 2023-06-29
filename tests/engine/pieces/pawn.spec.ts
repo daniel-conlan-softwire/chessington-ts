@@ -177,7 +177,7 @@ describe('Pawn', () => {
                 board.movePiece(Square.at(4, 4), Square.at(5, 5));
 
                 expect(board.getPiece(Square.at(4, 5))).to.be.undefined;
-                expect(board.getPiece(Square.at(6, 5))).to.be.equal(pawn);
+                expect(board.getPiece(Square.at(5, 5))).to.be.equal(pawn);
             });
         });
     });
