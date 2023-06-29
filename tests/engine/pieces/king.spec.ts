@@ -77,6 +77,7 @@ describe('King', () => {
     });
 
     describe('Castling (white)', () => {
+
         it('can castle left if possible', () => {
             const king = new King(Player.WHITE);
             const leftRook = new Rook(Player.WHITE);
@@ -185,30 +186,35 @@ describe('King', () => {
             const king = new King(Player.WHITE);
             const leftRook = new Rook(Player.WHITE);
 
-            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 4), king);
             board.setPiece(Square.at(0, 0), leftRook);
 
-            board.movePiece(Square.at(0, 3), Square.at(0, 1));
+            board.movePiece(Square.at(0, 4), Square.at(0, 2));
 
-            expect(board.getPiece(Square.at(0, 1))).instanceOf(King);
-            expect(board.getPiece(Square.at(0, 2))).instanceOf(Rook);
+            expect(board.getPiece(Square.at(0, 2))).instanceOf(King);
+            expect(board.getPiece(Square.at(0, 3))).instanceOf(Rook);
         });
 
         it('castling right is performd correctly', () => {
             const king = new King(Player.WHITE);
             const rightRook = new Rook(Player.WHITE);
 
-            board.setPiece(Square.at(0, 3), king);
+            board.setPiece(Square.at(0, 4), king);
             board.setPiece(Square.at(0, 7), rightRook);
 
-            board.movePiece(Square.at(0, 3), Square.at(0, 5));
+            board.movePiece(Square.at(0, 4), Square.at(0, 6));
 
-            expect(board.getPiece(Square.at(0, 5))).instanceOf(King);
-            expect(board.getPiece(Square.at(0, 4))).instanceOf(Rook);
+            expect(board.getPiece(Square.at(0, 6))).instanceOf(King);
+            expect(board.getPiece(Square.at(0, 5))).instanceOf(Rook);
         });
     });
 
     describe('Castling (black)', () => {
+
+        beforeEach(() => {
+            board.currentPlayer = Player.BLACK;
+        });
+
         it('can castle left if possible', () => {
             const king = new King(Player.BLACK);
             const leftRook = new Rook(Player.BLACK);

@@ -5,9 +5,11 @@ import SquareState from '../squareState';
 
 export default class Piece {
     public player: Player;
+    public hasMoved: boolean;
 
     public constructor(player: Player) {
         this.player = player;
+        this.hasMoved = false;
     }
 
     public getAvailableMoves(board: Board) {

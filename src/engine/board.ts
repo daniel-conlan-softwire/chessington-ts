@@ -41,16 +41,36 @@ export default class Board {
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
 
-            if (movingPiece instanceof Pawn && toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
-                this.setPiece(toSquare, new Queen(
-                    movingPiece.player
-                ));
-            }
-            
-            this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+            movingPiece.hasMoved = true;
 
+            if (movingPiece instanceof Pawn) {
+                if (toSquare.row === (this.currentPlayer === Player.WHITE ? 7 : 0)) {
+                    this.setPiece(toSquare, new Queen(
+                        movingPiece.player
+                    ));
+                }
+
+            } else if (movingPiece instanceof King) {
+                const diff = toSquare.col - fromSquare.col;
+                const kingHasCastled = Math.abs(diff) === 2;
+
+                if (kingHasCastled) {
+
+                    const isCastleRight = (diff === 2);
+                    const rookFrom = Square.at(toSquare.row, isCastleRight ? 7 : 0);
+                    const rookTo = Square.at(toSquare.row, toSquare.col + (isCastleRight ? -1 : 1));
+                    const rook = this.getPiece(rookFrom);
+
+                    this.setPiece(rookTo, rook);
+                    this.setPiece(rookFrom, undefined);
+                    rook!.hasMoved = true;
+                }
+            }
+            this.swapPlayer();
         }
     }
+
+    private swapPlayer() { this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE); }
 
     private createBoard() {
         const board = new Array(GameSettings.BOARD_SIZE);
@@ -90,5 +110,33 @@ export default class Board {
         }
 
     }
+
+    public isRowPathFree(row: number, columnFrom: number, columnTo: number) {
+
+        if (columnFrom > columnTo) {
+            [columnFrom, columnTo] = [columnTo, columnFrom];
+        }
+
+        for (let column = columnFrom + 1; column < columnTo; column++) {
+            if (this.squareState(Square.at(row, column)) !== SquareState.Free) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    // public isFreeRowPath(from: Square, to: Square) {
+
+    //     //const pathDirection = (from.col <) ? ;
+
+    //     for (let column = from.col; column != to.col; column += pathDirection) {
+    //         if (Square.at())
+    //     }
+
+    //     return true;
+
+    // }
 
 }
