@@ -90,9 +90,9 @@ describe('Pawn', () => {
             const pawn = new Pawn(Player.WHITE);
             board.setPiece(Square.at(6, 4), pawn);
 
-            board.movePiece(Square.at(6,4), Square.at(7,4));
+            board.movePiece(Square.at(6, 4), Square.at(7, 4));
 
-            const piece = board.getPiece(Square.at(7,4));
+            const piece = board.getPiece(Square.at(7, 4));
 
             expect(piece).instanceOf(Queen);
         });
@@ -101,12 +101,71 @@ describe('Pawn', () => {
             const pawn = new Pawn(Player.WHITE);
             board.setPiece(Square.at(5, 4), pawn);
 
-            board.movePiece(Square.at(5,4), Square.at(6,4));
+            board.movePiece(Square.at(5, 4), Square.at(6, 4));
 
-            const piece = board.getPiece(Square.at(6,4));
+            const piece = board.getPiece(Square.at(6, 4));
 
             expect(piece).instanceOf(Pawn);
-        })
+        });
+
+        describe('en passant', () => {
+            it("can take a pawn en passant (left)", () => {
+                const pawn = new Pawn(Player.WHITE);
+                const opposingPawn = new Pawn(Player.BLACK);
+                board.setPiece(Square.at(4, 4), pawn);
+                board.setPiece(Square.at(6, 3), opposingPawn);
+                board.movePiece(Square.at(6, 3), Square.at(4, 3));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.deep.include(Square.at(5, 3));
+            });
+
+            it("can take a pawn en passant (right)", () => {
+                const pawn = new Pawn(Player.WHITE);
+                const opposingPawn = new Pawn(Player.BLACK);
+                board.currentPlayer = Player.BLACK;
+                board.setPiece(Square.at(4, 4), pawn);
+                board.setPiece(Square.at(6, 5), opposingPawn);
+
+                board.movePiece(Square.at(6, 5), Square.at(4, 5));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.deep.include(Square.at(5, 5));
+            });
+
+            it("cannot take a pawn en passant if the opposing pawn has moved twice", () => {
+                const pawn = new Pawn(Player.WHITE);
+                const opposingPawn = new Pawn(Player.BLACK);
+                board.currentPlayer = Player.BLACK;
+                board.setPiece(Square.at(3, 4), pawn);
+                board.setPiece(Square.at(6, 3), opposingPawn);
+
+                board.movePiece(Square.at(6, 3), Square.at(5, 3));
+                board.movePiece(Square.at(3, 4), Square.at(4, 4));
+                board.movePiece(Square.at(5, 3), Square.at(4, 3));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.not.deep.include(Square.at(5, 3));
+            });
+
+            it("cannot take a pawn en passant if a turn has passed", () => {
+                const pawn = new Pawn(Player.WHITE);
+                const opposingPawn = new Pawn(Player.BLACK);
+                board.currentPlayer = Player.BLACK;
+                board.setPiece(Square.at(4, 4), pawn);
+                board.setPiece(Square.at(6, 3), opposingPawn);
+
+                board.movePiece(Square.at(6, 3), Square.at(4, 3));
+                board.movePiece(Square.at(4, 4), Square.at(3, 4));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.not.deep.include(Square.at(5, 3));
+            });
+        });
     });
 
     describe('black pawns', () => {
@@ -190,9 +249,9 @@ describe('Pawn', () => {
             const pawn = new Pawn(Player.BLACK);
             board.setPiece(Square.at(1, 4), pawn);
 
-            board.movePiece(Square.at(1,4), Square.at(0,4));
+            board.movePiece(Square.at(1, 4), Square.at(0, 4));
 
-            const piece = board.getPiece(Square.at(0,4));
+            const piece = board.getPiece(Square.at(0, 4));
 
             expect(piece).instanceOf(Queen);
         });
@@ -201,12 +260,73 @@ describe('Pawn', () => {
             const pawn = new Pawn(Player.BLACK);
             board.setPiece(Square.at(2, 4), pawn);
 
-            board.movePiece(Square.at(2,4), Square.at(1,4));
+            board.movePiece(Square.at(2, 4), Square.at(1, 4));
 
-            const piece = board.getPiece(Square.at(1,4));
+            const piece = board.getPiece(Square.at(1, 4));
 
             expect(piece).instanceOf(Pawn);
-        })
+        });
+
+        describe('en passant', () => {
+
+
+            it("can take a pawn en passant (left)", () => {
+                const pawn = new Pawn(Player.BLACK);
+                const opposingPawn = new Pawn(Player.WHITE);
+                board.setPiece(Square.at(3, 4), pawn);
+                board.setPiece(Square.at(1, 3), opposingPawn);
+                board.movePiece(Square.at(1, 3), Square.at(3, 3));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.deep.include(Square.at(2, 3));
+            });
+
+            it("can take a pawn en passant (right)", () => {
+                const pawn = new Pawn(Player.BLACK);
+                const opposingPawn = new Pawn(Player.WHITE);
+                board.currentPlayer = Player.WHITE;
+                board.setPiece(Square.at(3, 4), pawn);
+                board.setPiece(Square.at(1, 5), opposingPawn);
+
+                board.movePiece(Square.at(1, 5), Square.at(3, 5));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.deep.include(Square.at(2, 5));
+            });
+
+            it("cannot take a pawn en passant if the opposing pawn has moved twice", () => {
+                const pawn = new Pawn(Player.BLACK);
+                const opposingPawn = new Pawn(Player.WHITE);
+                board.currentPlayer = Player.WHITE;
+                board.setPiece(Square.at(4, 4), pawn);
+                board.setPiece(Square.at(1, 3), opposingPawn);
+
+                board.movePiece(Square.at(1, 3), Square.at(2, 3));
+                board.movePiece(Square.at(4, 4), Square.at(3, 4));
+                board.movePiece(Square.at(2, 3), Square.at(3, 3));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.not.deep.include(Square.at(2, 3));
+            });
+
+            it("cannot take a pawn en passant if a turn has passed", () => {
+                const pawn = new Pawn(Player.BLACK);
+                const opposingPawn = new Pawn(Player.WHITE);
+                board.currentPlayer = Player.WHITE;
+                board.setPiece(Square.at(3, 4), pawn);
+                board.setPiece(Square.at(1, 3), opposingPawn);
+
+                board.movePiece(Square.at(1, 3), Square.at(3, 3));
+                board.movePiece(Square.at(3, 4), Square.at(4, 4));
+
+                const moves = pawn.getAvailableMoves(board);
+
+                moves.should.not.deep.include(Square.at(2, 3));
+            });
+        });
     });
 
     it('cannot move if there is a piece in front', () => {
