@@ -16,7 +16,7 @@ export default class Queen extends Piece {
         const currentPosition = board.findPiece(this);
 
         const offsetDirections = [-1, 0, 1];
-
+        
         for (let rowOffsetDirection of offsetDirections) {
             for (let colOffsetDirection of offsetDirections) {
 
@@ -29,11 +29,11 @@ export default class Queen extends Piece {
                         currentPosition.col + offset * colOffsetDirection
                     );
 
-                    if (this.isSquareAvailable(nextSquare, this.player, board)) {
+                    if (this.isSquareAvailable(nextSquare, board)) {
                         availableMoves.push(nextSquare);
                     }
 
-                    if (this.isSquareBlocking(nextSquare, this.player, board)) {
+                    if (this.isSquareBlocking(nextSquare, board)) {
                         break;
                     }
 

@@ -16,13 +16,10 @@ export default class Rook extends Piece {
         const currentPosition = board.findPiece(this);
 
         const offsetDirections = [
-            [1, 0],
-            [-1, 0],
-            [0, 1],
-            [0, -1],
+            [1, 0], [-1, 0],
+            [0, 1], [0, -1],
         ];
 
-        // Upwards
         for (let [rowOffsetDirection, colOffsetDirection] of offsetDirections) {
             for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
 
@@ -31,11 +28,11 @@ export default class Rook extends Piece {
                     currentPosition.col + offset * colOffsetDirection
                 );
 
-                if (this.isSquareAvailable(nextSquare, this.player, board)) {
+                if (this.isSquareAvailable(nextSquare, board)) {
                     availableMoves.push(nextSquare);
                 }
 
-                if (this.isSquareBlocking(nextSquare, this.player, board)) {
+                if (this.isSquareBlocking(nextSquare, board)) {
                     break;
                 }
 

@@ -16,9 +16,9 @@ export default class Pawn extends Piece {
 
     public getAvailableMoves(board: Board) {
 
-        const moveDirection = (this.player === Player.WHITE) ? 1 : -1;
-
         const availableMoves = new Array();
+
+        const moveDirection = (this.player === Player.WHITE) ? 1 : -1;
         const currentPosition = board.findPiece(this);
         const nextPosition = new Square(currentPosition.row + moveDirection, currentPosition.col);
 
@@ -44,14 +44,13 @@ export default class Pawn extends Piece {
                 currentPosition.col + takeDirection
             );
 
-            if (this.isSquareAvailable(targetSquare, this.player, board)) {
+            if (this.isSquareAvailable(targetSquare, board)) {
                 availableMoves.push(targetSquare);
             }
 
         }
 
-        
-        // // En-Passant
+        // En-Passant
         for (let takeDirection of [-1, 1]) {
 
             const enPassantSquare = Square.at(
@@ -77,7 +76,7 @@ export default class Pawn extends Piece {
         return availableMoves;
     }
 
-    protected isSquareAvailable(square: Square, player: Player, board: Board): boolean {
+    protected isSquareAvailable(square: Square, board: Board): boolean {
         switch (board.squareState(square)) {
             case SquareState.White:
                 return this.player === Player.BLACK;

@@ -10,30 +10,24 @@ export default class Knight extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
-        const offsets = [
-            [1, 2],
-            [2, 1],
-            [-1, 2],
-            [2, -1],
-            [-2, 1],
-            [1, -2],
-            [-1, -2],
-            [-2, -1],
+
+        const moveOffsets = [
+            [1, 2], [1, -2], [-1, 2], [-1, -2],
+            [2, 1], [2, -1], [-2, 1], [-2, -1],
         ];
 
         const current = board.findPiece(this);
         const availableMoves = new Array();
 
-        for (let [rowOffset, colOffset] of offsets) {
-
+        for (let [rowOffset, colOffset] of moveOffsets) {
             const nextSquare = new Square(current.row + rowOffset, current.col + colOffset);
 
-            if (this.isSquareAvailable(nextSquare, this.player, board)) {
+            if (this.isSquareAvailable(nextSquare, board)) {
                 availableMoves.push(nextSquare);
             }
-
         }
 
         return availableMoves;
+
     }
 }

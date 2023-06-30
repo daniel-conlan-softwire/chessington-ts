@@ -15,6 +15,7 @@ export default class King extends Piece {
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
 
+        // Standard Moves
         const offsets = [1, 0, -1];
 
         for (let rowOffset of offsets) {
@@ -25,60 +26,31 @@ export default class King extends Piece {
                     currentPosition.col + colOffset
                 );
 
-                if (this.isSquareAvailable(nextSquare, this.player, board)) {
+                if (this.isSquareAvailable(nextSquare, board)) {
                     availableMoves.push(nextSquare);
                 }
                 
             }
         }
 
-        // if (king not moved) {
-
-        //     if (left rook not moved) {
-        //         Add castling square
-        //     }
-
-        //     if (right rook not moved) {
-        //         Add castling square
-        //     }
-
-        // }
-
         // Castling
         if (!this.hasMoved) {
 
-            // left rook
-            let leftRook = board.getPiece(Square.at(
-                currentPosition.row,
-                0
-            ));
+            for (let castleDirection of [-1, 1]) {
 
-            if (leftRook instanceof Rook && !leftRook.hasMoved && board.isRowPathFree(currentPosition.row, 0, currentPosition.col)) {
-                availableMoves.push(Square.at(currentPosition.row, currentPosition.col - 2));
+                const rookColumn = (castleDirection === -1) ? 0 : 7;
+
+                let rookPiece = board.getPiece(Square.at(
+                    currentPosition.row,
+                    rookColumn
+                ));
+
+                if (rookPiece instanceof Rook && !rookPiece.hasMoved && board.isRowPathFree(currentPosition.row, rookColumn, currentPosition.col)) {
+                    availableMoves.push(Square.at(currentPosition.row, currentPosition.col + 2*castleDirection));
+                }
+
             }
 
-            // right rook
-            let rightRook = board.getPiece(Square.at(
-                currentPosition.row,
-                7
-            ));
-
-            if (rightRook instanceof Rook && !rightRook.hasMoved && board.isRowPathFree(currentPosition.row, 7, currentPosition.col)) {
-                availableMoves.push(Square.at(currentPosition.row, currentPosition.col + 2));
-            }
-
-            // for (let castleDirection of [1, -1]) {
-
-            //     let rookPiece = board.getPiece(Square.at(
-            //         currentPosition.row,
-            //         (GameSettings.BOARD_SIZE + castleDirection) % GameSettings.BOARD_SIZE
-            //     ));
-
-            //     if (rookPiece instanceof Rook && !rookPiece.hasMoved) {
-            //         availableMoves.push(Square.at(currentPosition.row, currentPosition.col + 2*castleDirection));
-            //     }
-
-            // }
         }      
 
         return availableMoves;

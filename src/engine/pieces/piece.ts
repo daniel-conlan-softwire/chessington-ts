@@ -22,7 +22,7 @@ export default class Piece {
     }
 
 
-    protected isSquareAvailable(square: Square, player: Player, board: Board) {
+    protected isSquareAvailable(square: Square, board: Board) {
         
         switch (board.squareState(square)) {
             case SquareState.White:
@@ -38,7 +38,7 @@ export default class Piece {
 
     }
 
-    protected isSquareBlocking(square: Square, player: Player, board: Board) {
+    protected isSquareBlocking(square: Square, board: Board) {
 
         switch (board.squareState(square)) {
             case SquareState.White:

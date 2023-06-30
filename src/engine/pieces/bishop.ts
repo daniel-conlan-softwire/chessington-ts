@@ -15,7 +15,7 @@ export default class Bishop extends Piece {
         const availableMoves = new Array();
         const currentPosition = board.findPiece(this);
 
-        // Everywhere
+        // Standard Moves
         for (let rowOffsetDirection of [1, -1]) {
             for (let colOffsetDirection of [1, -1]) {
                 for (let offset = 1; offset < GameSettings.BOARD_SIZE; offset++) {
@@ -25,11 +25,11 @@ export default class Bishop extends Piece {
                         currentPosition.col + offset*colOffsetDirection
                     );
 
-                    if (this.isSquareAvailable(nextSquare, this.player, board)) {
+                    if (this.isSquareAvailable(nextSquare, board)) {
                         availableMoves.push(nextSquare);
                     }
 
-                    if (this.isSquareBlocking(nextSquare, this.player, board)) {
+                    if (this.isSquareBlocking(nextSquare, board)) {
                         break;
                     }
 
